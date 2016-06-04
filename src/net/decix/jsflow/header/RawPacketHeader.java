@@ -38,7 +38,8 @@ public class RawPacketHeader {
 	private long headerSize;
 	
 	private MacHeader macHeader;
-
+    private IPv4Header ipv4Header;
+	
 	public long getHeaderProtocol() {
 		return headerProtocol;
 	}
@@ -57,6 +58,10 @@ public class RawPacketHeader {
 
 	public MacHeader getMacHeader() {
 		return macHeader;
+	}
+	
+	public IPv4Header getIPv4Header() {
+		return ipv4Header;
 	}
 
 	public void setHeaderProtocol(long headerProtocol) {
@@ -77,6 +82,10 @@ public class RawPacketHeader {
 
 	public void setMacHeader(MacHeader macHeader) {
 		this.macHeader = macHeader;
+	}
+	
+	public void setIPv4Header(IPv4Header ipv4Header) {
+		this.ipv4Header = ipv4Header;
 	}
 	
 	public static RawPacketHeader parse(byte[] data) throws HeaderParseException {
@@ -105,6 +114,11 @@ public class RawPacketHeader {
 				System.arraycopy(data, 16, macHeader, 0, data.length - 16);
 				MacHeader m = MacHeader.parse(macHeader);
 				rp.setMacHeader(m);
+			} else if (rp.getHeaderProtocol() == IPV4) {
+				byte[] ipv4Header = new byte[data.length - 16];
+				System.arraycopy(data, 16, ipv4Header, 0, data.length -16);
+				IPv4Header ip = IPv4Header.parse(ipv4Header);
+				rp.setIPv4Header(ip);
 			} else {
 				System.err.println("Sample data format not yet supported: " + rp.getHeaderProtocol());
 			}
@@ -127,7 +141,6 @@ public class RawPacketHeader {
 			System.arraycopy(Utility.longToFourBytes(stripped), 0, data, 8, 4);
 			// header size
 			System.arraycopy(Utility.longToFourBytes(headerSize), 0, data, 12, 4);
-			
 			// mac header
 			System.arraycopy(macHeaderBytes, 0, data, 16, macHeaderBytes.length);
 			
