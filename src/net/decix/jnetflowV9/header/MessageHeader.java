@@ -33,6 +33,7 @@ public class MessageHeader extends AbstractHeader implements NetFlowV9Entity {
 	private final static int HEADERLENGTH = 16;
 	
 	private int versionNumber;
+	private long sysUptime;
 	private Date exportTime;
 	private long sequenceNumber;
 	private long observationDomainID;
@@ -96,22 +97,25 @@ public class MessageHeader extends AbstractHeader implements NetFlowV9Entity {
 			byte[] length = new byte[2];
 			System.arraycopy(data, 2, length, 0, 2);
 			mh.setLength(Utility.twoBytesToInteger(length));
+			// system uptime
+			byte[] sysUptime = new byte[4];
+			System.arraycopy(data, 4, sysUptime, 0 ,4);
 			// export time
 			byte[] exportTime = new byte[4];
-			System.arraycopy(data, 4, exportTime, 0, 4);
+			System.arraycopy(data, 8, exportTime, 0, 4);
 			long secondsSinceEpoche = Utility.fourBytesToLong(exportTime);
 			long milliSecondsSinceEpoche = secondsSinceEpoche * 1000;
 			mh.setExportTime(new Date(milliSecondsSinceEpoche));
 			// sequence number
 			byte[] sequenceNumber = new byte[4];
-			System.arraycopy(data, 8, sequenceNumber, 0, 4);
+			System.arraycopy(data, 12, sequenceNumber, 0, 4);
 			mh.setSequenceNumber(Utility.fourBytesToLong(sequenceNumber));
 			// observation domain id
 			byte[] observationDomainID = new byte[4];
-			System.arraycopy(data, 12, observationDomainID, 0, 4);
+			System.arraycopy(data, 16, observationDomainID, 0, 4);
 			mh.setObservationDomainID(Utility.fourBytesToLong(observationDomainID));
 			// set header
-			int offset = 16;
+			int offset = 20;
 			
 			while ((mh.getLength() - offset) > 0) { 
 				byte[] subData = new byte[mh.getLength() - offset]; 
@@ -134,14 +138,16 @@ public class MessageHeader extends AbstractHeader implements NetFlowV9Entity {
 			System.arraycopy(Utility.integerToTwoBytes(versionNumber), 0, data, 0, 2);
 			// length
 			System.arraycopy(Utility.integerToTwoBytes(length), 0, data, 2, 2);
+			// system uptime
+			System.arraycopy(Utility.longToFourBytes(sysUptime), 0, data, 4, 4);
 			// export time
-			System.arraycopy(Utility.longToFourBytes(exportTime.getTime() / 1000), 0, data, 4, 4);
+			System.arraycopy(Utility.longToFourBytes(exportTime.getTime() / 1000), 0, data, 8, 4);
 			// sequence number
-			System.arraycopy(Utility.longToFourBytes(sequenceNumber), 0, data, 8, 4);
+			System.arraycopy(Utility.longToFourBytes(sequenceNumber), 0, data, 12, 4);
 			// observation domain id
-			System.arraycopy(Utility.longToFourBytes(observationDomainID), 0, data, 12, 4);
+			System.arraycopy(Utility.longToFourBytes(observationDomainID), 0, data, 16, 4);
 			// set header
-			int offset = 16;
+			int offset = 20;
 			for (SetHeader sh : setHeaders) { 
 				byte[] temp = sh.getBytes();
 				System.arraycopy(temp, 0, data, offset, sh.getLength());
@@ -158,19 +164,21 @@ public class MessageHeader extends AbstractHeader implements NetFlowV9Entity {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[MessageHeader]: ");
-		sb.append("Version Number: ");
+		sb.append("Version: ");
 		sb.append(versionNumber);
 		sb.append(", ");
-		sb.append("Length: ");
+		sb.append("Count: ");
 		sb.append(length);
 		sb.append(", ");
-		sb.append("Export time: ");
+		sb.append("System Uptime: ");
+		sb.append(sysUptime);
+		sb.append("UNIX Seconds: ");
 		sb.append(exportTime);
 		sb.append(", ");
-		sb.append("Sequence number: ");
+		sb.append("Package Sequence: ");
 		sb.append(sequenceNumber);
 		sb.append(", ");
-		sb.append("Observation Domain ID: ");
+		sb.append("Source ID: ");
 		sb.append(observationDomainID);
 		sb.append(", ");
 		sb.append("SetHeaders: ");
