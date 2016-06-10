@@ -98,7 +98,7 @@ public class SetHeader extends AbstractHeader implements NetFlowV9Entity {
 			System.arraycopy(data, 2, length, 0, 2);
 			sh.setLength(Utility.twoBytesToInteger(length));
 			// 2 -> template sets;
-			if (sh.getSetID() == 2) {
+			if (sh.getSetID() == 0) {
 				int offset = 4;
 				byte[] subData = new byte[sh.getLength() - offset]; 
 				System.arraycopy(data, offset, subData, 0, subData.length);
@@ -106,32 +106,22 @@ public class SetHeader extends AbstractHeader implements NetFlowV9Entity {
 				sh.getTemplateRecords().add(tr);
 			} 
 			// 3 -> template option sets
-			else if (sh.getSetID() == 3) {
+			else if (sh.getSetID() == 1) {
 				int offset = 4;
 				byte[] subData = new byte[sh.getLength() - offset];
 				System.arraycopy(data, offset, subData, 0, subData.length);
 				OptionTemplateRecord otr = OptionTemplateRecord.parse(subData);
 				sh.getOptionTemplateRecords().add(otr);
 			}
-			// > 256 -> data record;
-			else if (sh.getSetID() == 256) {
+			// > 255 -> data record;
+			else if (sh.getSetID() > 255) {
 				int offset = 4;
 				byte[] subData = new byte[sh.getLength() - offset]; 
 				System.arraycopy(data, offset, subData, 0, SamplingDataRecord.LENGTH);
 				SamplingDataRecord sdr = SamplingDataRecord.parse(subData); 
 				sh.getDataRecords().add(sdr);
-			}
-			else if (sh.getSetID() == 306) {
-				int offset = 4;
-				while ((sh.getLength() - offset - L2IPDataRecord.LENGTH) >= 0) { 
-					byte[] subData = new byte[sh.getLength() - offset]; 
-					System.arraycopy(data, offset, subData, 0, L2IPDataRecord.LENGTH);
-					L2IPDataRecord lidr = L2IPDataRecord.parse(subData); 
-					sh.getDataRecords().add(lidr);
-					offset += L2IPDataRecord.LENGTH;
-				}
-				if ((sh.getLength() - offset) != 0) LOGGER.log(Level.INFO, "Unused bytes: " + (sh.getLength() - offset));
 			} else {
+				// 2 <= sh.getSetID() <= 255
 				LOGGER.log(Level.INFO, "Set ID " + sh.getSetID() + " is unknown and not handled");
 			}
 			return sh;			

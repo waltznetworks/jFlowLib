@@ -11,6 +11,9 @@ import net.decix.util.HeaderParseException;
 public class NetFlowV9Collector {
 	public static void main(String args[]) {
 		DatagramSocket ds = null;
+		System.out.println("+----------------------------+");
+		System.out.println("|    NetFlow v9 Collector    |");
+		System.out.println("+----------------------------+");
 		try {
 			ds = new DatagramSocket(2055);
 			while (true) {
