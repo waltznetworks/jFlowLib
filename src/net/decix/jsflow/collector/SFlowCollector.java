@@ -37,7 +37,7 @@ public class SFlowCollector {
 				DatagramPacket dp = new DatagramPacket(data, data.length);
 				ds.receive(dp);
 				SFlowHeader rph = SFlowHeader.parse(dp.getData());
-				System.out.println(rph.getAddressAgent().toString());
+				System.out.println("Agent IP address: " + rph.getAddressAgent().toString());
 				Vector<SampleDataHeader> sdhs = rph.getSampleDataHeaders();
 				for (SampleDataHeader sdh : sdhs) {
 					System.out.println("SampleDataHeader format: " + sdh.getSampleDataFormat());
