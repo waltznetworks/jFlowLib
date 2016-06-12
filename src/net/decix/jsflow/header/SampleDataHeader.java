@@ -17,12 +17,16 @@ import net.decix.util.Utility;
 
 
 public class SampleDataHeader {
+	public final static long FLOWSAMPLE = 1;
+	public final static long COUNTERSAMPLE = 2;
 	public final static long EXPANDEDFLOWSAMPLE = 3;
 	public final static long EXPANDEDCOUNTERSAMPLE = 4;
 	
 	private long sampleDataFormat; // 20 bit enterprise & 12 bit format; standard enterprise 0, format 1, 2, 3, 4 
 	private long sampleLength; // in byte
-	
+
+	private FlowRecordHeader flowRecordHeader;
+	private CounterRecordHeader counterRecordHeader;
 	private ExpandedFlowSampleHeader expandedFlowSampleHeader;
 	private ExpandedCounterSampleHeader expandedCounterSampleHeader;
 	
@@ -43,6 +47,14 @@ public class SampleDataHeader {
 	
 	public long getSampleLength() {
 		return sampleLength;
+	}
+
+	public void setFlowRecordHeader(FlowRecordHeader fr) {
+		flowRecordHeader = fr;
+	}
+
+	public void setCounterRecordHeader(CounterRecordHeader cr) {
+		counterRecordHeader = cr;
 	}
 	
 	public void setExpandedFlowSampleHeader(ExpandedFlowSampleHeader efs) {
@@ -73,21 +85,23 @@ public class SampleDataHeader {
 			byte[] length = new byte[4];
 			System.arraycopy(data, 4, length, 0, 4);
 			sdh.setSampleLength(Utility.fourBytesToLong(length));
-			
-			if (sdh.getSampleDataFormat() == EXPANDEDFLOWSAMPLE) {
-				byte[] subData = new byte[(int) sdh.getSampleLength()]; 
-				System.arraycopy(data, 8, subData, 0, (int) sdh.getSampleLength());
+
+            byte[] subData = new byte[(int) sdh.getSampleLength()];
+            System.arraycopy(data, 8, subData, 0, (int) sdh.getSampleLength());
+
+			if (sdh.getSampleDataFormat() == FLOWSAMPLE) {
+				FlowRecordHeader frd = FlowRecordHeader.parse(subData);
+				sdh.setFlowRecordHeader(frd);
+			} else if (sdh.getSampleDataFormat() == COUNTERSAMPLE) {
+                CounterRecordHeader crd = CounterRecordHeader.parse(subData);
+				sdh.setCounterRecordHeader(crd);
+			} else if (sdh.getSampleDataFormat() == EXPANDEDFLOWSAMPLE) {
 				ExpandedFlowSampleHeader efs = ExpandedFlowSampleHeader.parse(subData);
 				sdh.setExpandedFlowSampleHeader(efs);
-			} 
-			if (sdh.getSampleDataFormat() == EXPANDEDCOUNTERSAMPLE) {
-				byte[] subData = new byte[(int) sdh.getSampleLength()];
-				System.arraycopy(data, 8, subData, 0, (int) sdh.getSampleLength());
+			} else if (sdh.getSampleDataFormat() == EXPANDEDCOUNTERSAMPLE) {
 				ExpandedCounterSampleHeader ecs = ExpandedCounterSampleHeader.parse(subData);
 				sdh.setExpandedCounterSampleHeader(ecs);
-			}
-			
-			if ((sdh.getSampleDataFormat() != EXPANDEDFLOWSAMPLE) && (sdh.getSampleDataFormat() != EXPANDEDCOUNTERSAMPLE)) {
+			} else {
 				System.err.println("Sample data format not yet supported: " + sdh.getSampleDataFormat());
 			}
 			

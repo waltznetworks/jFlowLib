@@ -79,12 +79,10 @@ public class CounterRecordHeader {
 			if (crd.getCounterDataFormat() == GENERICINTERFACECOUNTER) {
 				GenericInterfaceCounterHeader gic = GenericInterfaceCounterHeader.parse(subData);
 				crd.setGenericInterfaceCounterHeader(gic);
-			}
-			if (crd.getCounterDataFormat() == ETHERNETINTERFACECOUNTER) {
+			} else if (crd.getCounterDataFormat() == ETHERNETINTERFACECOUNTER) {
 				EthernetInterfaceCounterHeader eic = EthernetInterfaceCounterHeader.parse(subData);
 				crd.setEthernetInterfaceCounterHeader(eic);
-			}
-			if ((crd.getCounterDataFormat() != GENERICINTERFACECOUNTER) && (crd.getCounterDataFormat() != ETHERNETINTERFACECOUNTER)) {
+			} else {
 				System.err.println("Counter data format not yet supported: " + crd.getCounterDataFormat());
 			}
 			
