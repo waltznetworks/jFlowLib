@@ -95,7 +95,7 @@ public class CounterSampleHeader {
 
 			if (true) {
 				System.out.println("sFlow counter sample header info:");
-				System.out.println("    counter sample sequence number: " + csh.getSampleLength());
+				System.out.println("    counter sample sequence number: " + csh.getSeqNumber());
 				System.out.println("    counter sample source ID type: " + csh.getSourceIdType());
 				System.out.println("    counter sample source ID index value: " + csh.getSourceIdIndexValue());
 				System.out.println("    counter sample length: " + csh.getSampleLength());
