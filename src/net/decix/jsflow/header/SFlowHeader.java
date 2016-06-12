@@ -20,6 +20,29 @@ import net.decix.util.HeaderParseException;
 import net.decix.util.MacAddress;
 import net.decix.util.Utility;
 
+/**
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                        version (2|4|5)                        |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |       IP version of the agent/switch (1 = IPv4|2 = IPv6       |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  S       Agent IP address (IPv4 = 4 bytes|IPv6 = 16 bytes        S
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                         sub agent id                          |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                   datagram sequence number                    |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                   agent/switch uptime in ms                   |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                       number of samples                       |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ * @author Hans Yu
+ *
+ */
+
 public class SFlowHeader {
 	private long version; // 2, 4, 5
 	private long ipVersionAgent; // 1=v4, 2=v6
@@ -140,6 +163,17 @@ public class SFlowHeader {
 			byte[] numberSamples = new byte[4];
 			System.arraycopy(data, 24, numberSamples, 0, 4);
 			rph.setNumberSamples(Utility.fourBytesToLong(numberSamples));
+
+			if (false) {
+				System.out.println("sFlow header info:");
+				System.out.println("    version: " + rph.getVersion());
+				System.out.println("    IP version: " + rph.getIPVersionAgent());
+				System.out.println("    agent: " + rph.getAddressAgent());
+				System.out.println("    sub agent id: " + rph.getSubAgentID());
+				System.out.println("    datagram sequence number: " + rph.getSeqNumber());
+				System.out.println("    system uptime: " + rph.getSysUptime());
+				System.out.println("    number of samples: " + rph.getNumberSample());
+			}
 			// sample data headers
 			int offset = 28;
 			for (int i = 0; i < rph.getNumberSample(); i++) {

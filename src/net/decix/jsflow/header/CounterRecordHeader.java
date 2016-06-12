@@ -15,6 +15,22 @@ import net.decix.util.HeaderBytesException;
 import net.decix.util.HeaderParseException;
 import net.decix.util.Utility;
 
+/**
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |       data format: enterprise         |  data format: format  |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                     counter data length                       |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ *  enterprise = 0 --> standard
+ *             > 0 --> vendor specified format
+ *  format = 1|2|3|4|5|1001
+ * @author Hans Yu
+ *
+ */
+
 public class CounterRecordHeader {
 	public static final int GENERICINTERFACECOUNTER = 1;
 	public static final int ETHERNETINTERFACECOUNTER = 2;
@@ -76,10 +92,19 @@ public class CounterRecordHeader {
 			
 			byte[] subData = new byte[(int) crd.getCounterDataLength()]; 
 			System.arraycopy(data, 8, subData, 0, (int) crd.getCounterDataLength());
+
+			if (true) {
+				System.out.println("sFlow counter record header info:");
+				System.out.println("    counter data format: " + crd.getCounterDataFormat());
+				System.out.println("    counter data length: " + crd.getCounterDataLength());
+			}
+
 			if (crd.getCounterDataFormat() == GENERICINTERFACECOUNTER) {
+				System.out.println("Received a generic interface counter sample.");
 				GenericInterfaceCounterHeader gic = GenericInterfaceCounterHeader.parse(subData);
 				crd.setGenericInterfaceCounterHeader(gic);
 			} else if (crd.getCounterDataFormat() == ETHERNETINTERFACECOUNTER) {
+				System.out.println("Received an Ethernet interface counter sample.");
 				EthernetInterfaceCounterHeader eic = EthernetInterfaceCounterHeader.parse(subData);
 				crd.setEthernetInterfaceCounterHeader(eic);
 			} else {
