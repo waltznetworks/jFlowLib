@@ -14,6 +14,7 @@ package net.decix.jsflow.header;
 import net.decix.util.HeaderBytesException;
 import net.decix.util.HeaderParseException;
 import net.decix.util.Utility;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  *  0                   1                   2                   3
@@ -34,6 +35,9 @@ import net.decix.util.Utility;
 public class CounterRecordHeader {
 	public static final int GENERICINTERFACECOUNTER = 1;
 	public static final int ETHERNETINTERFACECOUNTER = 2;
+
+	public static final int OVS_OPENFLOWPORT = 1004;
+	public static final int OVS_PORTNAME = 1005;
 	
 	private long counterDataFormat; // 20 bit enterprise & 12 bit format; standard enterprise 0, format 1, 2, 3, 4, 5, 1001 
 	private long counterDataLength; // in byte
@@ -80,40 +84,52 @@ public class CounterRecordHeader {
 	public static CounterRecordHeader parse(byte[] data) throws HeaderParseException {
 		try {
 			if (data.length < 8) throw new HeaderParseException("Data array too short.");
-			CounterRecordHeader crd = new CounterRecordHeader();
+			CounterRecordHeader crh = new CounterRecordHeader();
 			// format
 			byte[] format = new byte[4];
 			System.arraycopy(data, 0, format, 0, 4);
-			crd.setCounterDataFormat(Utility.fourBytesToLong(format));
+			crh.setCounterDataFormat(Utility.fourBytesToLong(format));
 			// length
 			byte[] length = new byte[4];
 			System.arraycopy(data, 4, length, 0, 4);
-			crd.setCounterDataLength(Utility.fourBytesToLong(length));
+			crh.setCounterDataLength(Utility.fourBytesToLong(length));
 			
-			byte[] subData = new byte[(int) crd.getCounterDataLength()]; 
-			System.arraycopy(data, 8, subData, 0, (int) crd.getCounterDataLength());
+			byte[] subData = new byte[(int) crh.getCounterDataLength()];
+			System.arraycopy(data, 8, subData, 0, (int) crh.getCounterDataLength());
 
 			if (true) {
 				System.out.println("sFlow counter record header info:");
-				System.out.println("    counter data format: " + crd.getCounterDataFormat());
-				System.out.println("    counter data length: " + crd.getCounterDataLength());
+				System.out.println("    counter data format: " + crh.getCounterDataFormat());
+				System.out.println("    counter data length: " + crh.getCounterDataLength());
 			}
 
-			if (crd.getCounterDataFormat() == GENERICINTERFACECOUNTER) {
+			if (crh.getCounterDataFormat() == GENERICINTERFACECOUNTER) {
 				System.out.println("Received a generic interface counter sample.");
 				GenericInterfaceCounterHeader gic = GenericInterfaceCounterHeader.parse(subData);
-				crd.setGenericInterfaceCounterHeader(gic);
-			} else if (crd.getCounterDataFormat() == ETHERNETINTERFACECOUNTER) {
+				crh.setGenericInterfaceCounterHeader(gic);
+				System.out.println(crh.toString());
+			} else if (crh.getCounterDataFormat() == ETHERNETINTERFACECOUNTER) {
 				System.out.println("Received an Ethernet interface counter sample.");
 				EthernetInterfaceCounterHeader eic = EthernetInterfaceCounterHeader.parse(subData);
-				crd.setEthernetInterfaceCounterHeader(eic);
+				crh.setEthernetInterfaceCounterHeader(eic);
+			} else if (crh.getCounterDataFormat() == OVS_OPENFLOWPORT) {
+				byte[] dpid = new byte[8];
+				byte[] port = new byte[4];
+				System.arraycopy(subData, 0, dpid, 0, 8);
+				System.arraycopy(subData, 8, port, 0, 4);
+				System.out.println("OVS_DPID: " + DatatypeConverter.printHexBinary(dpid));
+				System.out.println("OVS_PORT: " + Utility.fourBytesToLong(port));
+			} else if (crh.getCounterDataFormat() == OVS_PORTNAME) {
+				byte[] portName = new byte[8];
+				System.arraycopy(subData, 0, portName, 0, 8);
+				System.out.println("OVS_PORTNAME: " + new String(portName));
 			} else {
-				System.err.println("Counter data format not yet supported: " + crd.getCounterDataFormat());
+				System.err.println("Counter data format not yet supported: " + crh.getCounterDataFormat());
 			}
 			
-			return crd;
+			return crh;
 		} catch (Exception e) {
-			throw new HeaderParseException("Parse error: " + e.getMessage());
+			throw new HeaderParseException("Error parsing counter data: " + e.getMessage());
 		}
 	}
 	

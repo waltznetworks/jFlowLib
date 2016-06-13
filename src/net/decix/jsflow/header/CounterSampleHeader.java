@@ -68,7 +68,7 @@ public class CounterSampleHeader {
 	}
 
 	public void addCounterRecordHeaders(CounterRecordHeader crh) {
-		counterRecordHeaders.add(crh);
+		this.counterRecordHeaders.add(crh);
 	}
 
 	public Vector<CounterRecordHeader> getCounterRecordHeaders() {
@@ -106,16 +106,19 @@ public class CounterSampleHeader {
 
 			int offset = 12;
 			for (int i = 0; i < csh.getSampleLength(); i++) {
+				System.out.println("    offset of sample " + i + ": " + offset);
 				byte[] subData = new byte[data.length - offset];
 				System.arraycopy(data, offset, subData, 0, data.length - offset);
 				CounterRecordHeader crh = CounterRecordHeader.parse(subData);
-				csh.addCounterRecordHeaders(crh);
-				offset += crh.getCounterDataLength();
+				// TODO: find out why csh.addCounterRecordHeaders(crh) is not working when
+				//       there is unsupported data format
+				//csh.addCounterRecordHeaders(crh);
+				offset += (crh.getCounterDataLength() + 8);
 			}
 
 			return csh;
 		} catch (Exception e) {
-			throw new HeaderParseException("Parse error: " + e.getMessage());
+			throw new HeaderParseException("Error parsing counter sample: " + e.getMessage());
 		}
 	}
 
