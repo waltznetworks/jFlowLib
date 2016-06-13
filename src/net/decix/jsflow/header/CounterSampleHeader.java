@@ -4,6 +4,7 @@ import net.decix.util.HeaderParseException;
 import net.decix.util.Utility;
 
 import javax.rmi.CORBA.Util;
+import java.util.Vector;
 
 /**
  *  0                   1                   2                   3
@@ -14,6 +15,8 @@ import javax.rmi.CORBA.Util;
  *  |        source ID type         |     source ID index value     |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *  |                  number of counter record                     |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  S                     n * counter records                       S
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  *  enterprise = 0 --> standard
@@ -27,7 +30,7 @@ public class CounterSampleHeader {
 	private int sourceIdIndexValue;
 	private long sampleLength;
 
-	private CounterRecordHeader counterRecordHeader;
+	private Vector<CounterRecordHeader> counterRecordHeaders;
 
 	public CounterSampleHeader() {
 	}
@@ -64,12 +67,12 @@ public class CounterSampleHeader {
 		return sampleLength;
 	}
 
-	public void setCounterRecordHeader(CounterRecordHeader crd) {
-		counterRecordHeader = crd;
+	public void addCounterRecordHeaders(CounterRecordHeader crh) {
+		counterRecordHeaders.add(crh);
 	}
 
-	public CounterRecordHeader getCounterRecordHeader() {
-		return counterRecordHeader;
+	public Vector<CounterRecordHeader> getCounterRecordHeaders() {
+		return counterRecordHeaders;
 	}
 
 	public static CounterSampleHeader parse(byte[] data) throws HeaderParseException {
@@ -99,6 +102,15 @@ public class CounterSampleHeader {
 				System.out.println("    counter sample source ID type: " + csh.getSourceIdType());
 				System.out.println("    counter sample source ID index value: " + csh.getSourceIdIndexValue());
 				System.out.println("    counter sample length: " + csh.getSampleLength());
+			}
+
+			int offset = 12;
+			for (int i = 0; i < csh.getSampleLength(); i++) {
+				byte[] subData = new byte[data.length - offset];
+				System.arraycopy(data, offset, subData, 0, data.length - offset);
+				CounterRecordHeader crh = CounterRecordHeader.parse(subData);
+				csh.addCounterRecordHeaders(crh);
+				offset += crh.getCounterDataLength();
 			}
 
 			return csh;
