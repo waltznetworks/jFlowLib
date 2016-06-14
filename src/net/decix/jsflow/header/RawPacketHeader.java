@@ -15,6 +15,41 @@ import net.decix.util.HeaderBytesException;
 import net.decix.util.HeaderParseException;
 import net.decix.util.Utility;
 
+/**
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                       header protocol                         |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                         frame length                          |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                           stripped                            |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                         header size                           |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  S                            header                             S
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ *  header protocol:
+ *    1 -> Ethernet ISO88023
+ *    2 -> Token Bus ISO88024
+ *    3 -> Token Ring ISO88025
+ *    4 -> FDDI
+ *    5 -> Frame Relay
+ *    6 -> X.25
+ *    7 -> PPP
+ *    8 -> SMDS
+ *    9 -> AAL5
+ *   10 -> AAL5_IP
+ *   11 -> IPv4
+ *   12 -> IPv6
+ *   13 -> MPLS
+ *   14 -> POS
+ *
+ * @author Hans Yu
+ *
+ */
+
 public class RawPacketHeader {
 	// enterprise = 0, format = 1
 	public static final int ETHERNET_ISO88023 = 1;

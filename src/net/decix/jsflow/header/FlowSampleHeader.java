@@ -171,21 +171,21 @@ public class FlowSampleHeader {
 			// sequence number
 			System.arraycopy(Utility.longToFourBytes(seqNumber), 0, data, 0, 4);
 			// source ID type
-			System.arraycopy(Utility.integerToTwoBytes(sourceIdType), 0, data, 4, 6);
+			System.arraycopy(Utility.integerToTwoBytes(sourceIdType), 0, data, 4, 2);
 			// source ID index value
-			System.arraycopy(Utility.integerToTwoBytes(sourceIdIndexValue), 0, data, 6, 8);
+			System.arraycopy(Utility.integerToTwoBytes(sourceIdIndexValue), 0, data, 6, 2);
 			// sampling rate
-			System.arraycopy(Utility.longToFourBytes(samplingRate), 0, data, 8, 12);
+			System.arraycopy(Utility.longToFourBytes(samplingRate), 0, data, 8, 4);
 			// sample pool
-			System.arraycopy(Utility.longToFourBytes(samplePool), 0, data, 12, 16);
+			System.arraycopy(Utility.longToFourBytes(samplePool), 0, data, 12, 4);
 			// drops
-			System.arraycopy(Utility.longToFourBytes(drops), 0, data, 16, 20);
+			System.arraycopy(Utility.longToFourBytes(drops), 0, data, 16, 4);
 			// input
-			System.arraycopy(Utility.longToFourBytes(input), 0, data, 20, 24);
+			System.arraycopy(Utility.longToFourBytes(input), 0, data, 20, 4);
 			// output
-			System.arraycopy(Utility.longToFourBytes(output), 0, data, 24, 28);
+			System.arraycopy(Utility.longToFourBytes(output), 0, data, 24, 4);
 			// length
-			System.arraycopy(Utility.longToFourBytes(sampleLength), 0, data, 28, 32);
+			System.arraycopy(Utility.longToFourBytes(sampleLength), 0, data, 28, 4);
 
 			int offset = 32;
 			for (FlowRecordHeader frh : flowRecordHeaders) {

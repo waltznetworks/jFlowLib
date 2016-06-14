@@ -109,11 +109,11 @@ public class CounterSampleHeader {
 			// sequence number
 			System.arraycopy(Utility.longToFourBytes(seqNumber), 0, data, 0, 4);
 			// source ID type
-			System.arraycopy(Utility.integerToTwoBytes(sourceIdType), 0, data, 4, 6);
+			System.arraycopy(Utility.integerToTwoBytes(sourceIdType), 0, data, 4, 2);
 			// source ID index value
-			System.arraycopy(Utility.integerToTwoBytes(sourceIdIndexValue), 0, data, 6, 8);
+			System.arraycopy(Utility.integerToTwoBytes(sourceIdIndexValue), 0, data, 6, 2);
 			// length
-			System.arraycopy(Utility.longToFourBytes(sampleLength), 0, data, 8, 12);
+			System.arraycopy(Utility.longToFourBytes(sampleLength), 0, data, 8, 4);
 
 			int offset = 12;
 			for (CounterRecordHeader crh : counterRecordHeaders) {

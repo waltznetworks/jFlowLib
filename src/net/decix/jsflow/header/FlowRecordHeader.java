@@ -36,10 +36,29 @@ import net.decix.util.Utility;
  */
 
 public class FlowRecordHeader {
+	public static final int RAW_PACKET_HEADER = 1;
+	public static final int ETHERNET_FRAME_DATA = 2;
+	public static final int IPV4_DATA = 3;
+	public static final int IPV6_DATA = 4;
+	public static final int EXTENDED_SWITCH_DATA = 1001;
+	public static final int EXTENDED_ROUTER_DATA = 1002;
+	public static final int EXTENDED_GATEWAY_DATA = 1003;
+	public static final int EXTENDED_USER_DATA = 1004;
+	public static final int EXTENDED_URL_DATA = 1005;
+	public static final int EXTENDED_MPLS_DATA = 1006;
+	public static final int EXTENDED_NAT_DATA = 1007;
+	public static final int EXTENDED_MPLS_TUNNEL = 1008;
+	public static final int EXTENDED_MPLS_VC = 1009;
+	public static final int EXTENDED_MPLS_FEC = 1010;
+	public static final int EXTENDED_MPLS_LVP_FEC = 1011;
+	public static final int EXTENDED_VLAN_TUNNEL = 1012;
+
 	private long flowDataFormat; // 20 bit enterprise & 12 bit format; standard enterprise 0, format 1, 2, 3, 4, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012 
 	private long flowDataLength; // in byte
 	
 	private RawPacketHeader rawPacket;
+	private EthernetFrameData ethernetFrameData;
+	private IPv4Data ipv4Data;
 	
 	public FlowRecordHeader() {
 	}
@@ -63,30 +82,55 @@ public class FlowRecordHeader {
 	public void setRawPacketHeader(RawPacketHeader rawPacket) {
 		this.rawPacket = rawPacket;
 	}
+
+	public void setEthernetFrameData(EthernetFrameData ethernetFrameData) {
+		this.ethernetFrameData = ethernetFrameData;
+	}
+
+	public void setIpv4Data(IPv4Data ipv4Data) {
+		this.ipv4Data = ipv4Data;
+	}
 	
 	public RawPacketHeader getRawPacketHeader() {
 		return rawPacket;
+	}
+
+	public EthernetFrameData getEthernetFrameData() { return ethernetFrameData; }
+
+	public IPv4Data getIpv4Data() {
+		return ipv4Data;
 	}
 	
 	public static FlowRecordHeader parse(byte[] data) throws HeaderParseException {
 		try {
 			if (data.length < 8) throw new HeaderParseException("Data array too short.");
-			FlowRecordHeader frd = new FlowRecordHeader();
+			FlowRecordHeader frh = new FlowRecordHeader();
 			// format
 			byte[] format = new byte[4];
 			System.arraycopy(data, 0, format, 0, 4);
-			frd.setFlowDataFormat(Utility.fourBytesToLong(format));
+			frh.setFlowDataFormat(Utility.fourBytesToLong(format));
 			// length
 			byte[] length = new byte[4];
 			System.arraycopy(data, 4, length, 0, 4);
-			frd.setFlowDataLength(Utility.fourBytesToLong(length));
-			
-			// raw packet header
-			byte[] subData = new byte[(int) frd.getFlowDataLength()]; 
-			System.arraycopy(data, 8, subData, 0, (int) frd.getFlowDataLength());
-			RawPacketHeader rp = RawPacketHeader.parse(subData);
-			frd.setRawPacketHeader(rp);
-			return frd;
+			frh.setFlowDataLength(Utility.fourBytesToLong(length));
+
+			byte[] subData = new byte[(int) frh.getFlowDataLength()];
+			System.arraycopy(data, 8, subData, 0, (int) frh.getFlowDataLength());
+
+			if (frh.getFlowDataFormat() == RAW_PACKET_HEADER) {
+				RawPacketHeader rph = RawPacketHeader.parse(subData);
+				frh.setRawPacketHeader(rph);
+			} else if (frh.getFlowDataFormat() == ETHERNET_FRAME_DATA) {
+				EthernetFrameData efd = EthernetFrameData.parse(subData);
+				frh.setEthernetFrameData(efd);
+			} else if (frh.getFlowDataFormat() == IPV4_DATA) {
+				IPv4Data i4d = IPv4Data.parse(subData);
+				frh.setIpv4Data(i4d);
+			} else {
+				System.err.println("Flow data format not yet supported: " + frh.getFlowDataFormat());
+			}
+
+			return frh;
 		} catch (Exception e) {
 			throw new HeaderParseException("Error parsing flow record: " + e.getMessage());
 		}
