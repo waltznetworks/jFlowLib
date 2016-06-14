@@ -146,7 +146,7 @@ public class FlowSampleHeader {
 
 			int offset = 32;
 			for (int i = 0; i < fsh.getSampleLength(); i++) {
-				System.out.println("    offset of sample " + i + ": " + offset);
+				//System.out.println("    offset of sample " + i + ": " + offset);
 				byte[] subData = new byte[data.length - offset];
 				System.arraycopy(data, offset, subData, 0, data.length - offset);
 				FlowRecordHeader frh = FlowRecordHeader.parse(subData);

@@ -84,7 +84,7 @@ public class CounterSampleHeader {
 
 			int offset = 12;
 			for (int i = 0; i < csh.getSampleLength(); i++) {
-				System.out.println("    offset of sample " + i + ": " + offset);
+				//System.out.println("    offset of sample " + i + ": " + offset);
 				byte[] subData = new byte[data.length - offset];
 				System.arraycopy(data, offset, subData, 0, data.length - offset);
 				CounterRecordHeader crh = CounterRecordHeader.parse(subData);
