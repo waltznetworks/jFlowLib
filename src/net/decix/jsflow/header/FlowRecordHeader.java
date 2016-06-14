@@ -68,7 +68,7 @@ public class FlowRecordHeader {
 			frd.setRawPacketHeader(rp);
 			return frd;
 		} catch (Exception e) {
-			throw new HeaderParseException("Parse error: " + e.getMessage());
+			throw new HeaderParseException("Error parsing flow record: " + e.getMessage());
 		}
 	}
 	

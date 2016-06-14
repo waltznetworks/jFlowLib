@@ -2,8 +2,6 @@ package net.decix.jsflow.header;
 
 import net.decix.util.HeaderParseException;
 import net.decix.util.Utility;
-
-import javax.rmi.CORBA.Util;
 import java.util.Vector;
 
 /**
@@ -19,8 +17,6 @@ import java.util.Vector;
  *  S                     n * counter records                       S
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- *  enterprise = 0 --> standard
- *             > 0 --> vendor specified format
  * @author Hans Yu
  *
  */
@@ -33,47 +29,28 @@ public class CounterSampleHeader {
 	private Vector<CounterRecordHeader> counterRecordHeaders;
 
 	public CounterSampleHeader() {
+		counterRecordHeaders = new Vector<CounterRecordHeader>();
 	}
 
-	public void setSeqNumber(long seqNumber) {
-		this.seqNumber = seqNumber;
-	}
+	public void setSeqNumber(long seqNumber) { this.seqNumber = seqNumber; }
 
-	public void setSourceIdType(int sourceIdType) {
-		this.sourceIdType = sourceIdType;
-	}
+	public void setSourceIdType(int sourceIdType) { this.sourceIdType = sourceIdType; }
 
-	public void setSourceIdIndexValue(int sourceIdIndexValue) {
-		this.sourceIdIndexValue = sourceIdIndexValue;
-	}
+	public void setSourceIdIndexValue(int sourceIdIndexValue) { this.sourceIdIndexValue = sourceIdIndexValue; }
 
-	public void setSampleLength(long sampleLength) {
-		this.sampleLength = sampleLength;
-	}
+	public void setSampleLength(long sampleLength) { this.sampleLength = sampleLength; }
 
-	public long getSeqNumber() {
-		return seqNumber;
-	}
+	public long getSeqNumber() { return seqNumber; }
 
-	public int getSourceIdType() {
-		return sourceIdType;
-	}
+	public int getSourceIdType() { return sourceIdType; }
 
-	public int getSourceIdIndexValue() {
-		return sourceIdIndexValue;
-	}
+	public int getSourceIdIndexValue() { return sourceIdIndexValue; }
 
-	public long getSampleLength() {
-		return sampleLength;
-	}
+	public long getSampleLength() { return sampleLength; }
 
-	public void addCounterRecordHeaders(CounterRecordHeader crh) {
-		this.counterRecordHeaders.add(crh);
-	}
+	public void addCounterRecordHeaders(CounterRecordHeader crh) { this.counterRecordHeaders.add(crh); }
 
-	public Vector<CounterRecordHeader> getCounterRecordHeaders() {
-		return counterRecordHeaders;
-	}
+	public Vector<CounterRecordHeader> getCounterRecordHeaders() { return counterRecordHeaders; }
 
 	public static CounterSampleHeader parse(byte[] data) throws HeaderParseException {
 		try {
@@ -88,9 +65,9 @@ public class CounterSampleHeader {
 			System.arraycopy(data, 4, sourceIdType, 0, 2);
 			csh.setSourceIdType(Utility.twoBytesToInteger(sourceIdType));
 			// source ID index value
-			byte[] souceIdIndexValue = new byte[2];
-			System.arraycopy(data, 6, souceIdIndexValue, 0, 2);
-			csh.setSourceIdIndexValue(Utility.twoBytesToInteger(souceIdIndexValue));
+			byte[] sourceIdIndexValue = new byte[2];
+			System.arraycopy(data, 6, sourceIdIndexValue, 0, 2);
+			csh.setSourceIdIndexValue(Utility.twoBytesToInteger(sourceIdIndexValue));
 			// length
 			byte[] length = new byte[4];
 			System.arraycopy(data, 8, length, 0, 4);
@@ -112,7 +89,7 @@ public class CounterSampleHeader {
 				CounterRecordHeader crh = CounterRecordHeader.parse(subData);
 				// TODO: find out why csh.addCounterRecordHeaders(crh) is not working when
 				//       there is unsupported data format
-				//csh.addCounterRecordHeaders(crh);
+				csh.addCounterRecordHeaders(crh);
 				offset += (crh.getCounterDataLength() + 8);
 			}
 

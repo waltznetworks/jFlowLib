@@ -129,7 +129,7 @@ public class CounterRecordHeader {
 			
 			return crh;
 		} catch (Exception e) {
-			throw new HeaderParseException("Error parsing counter data: " + e.getMessage());
+			throw new HeaderParseException("Error parsing counter record: " + e.getMessage());
 		}
 	}
 	
