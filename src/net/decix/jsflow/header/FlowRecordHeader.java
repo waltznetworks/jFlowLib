@@ -117,6 +117,12 @@ public class FlowRecordHeader {
 			byte[] subData = new byte[(int) frh.getFlowDataLength()];
 			System.arraycopy(data, 8, subData, 0, (int) frh.getFlowDataLength());
 
+			if (true) {
+				System.out.println("sFlow flow record header info:");
+				System.out.println("    flow data format: " + frh.getFlowDataFormat());
+				System.out.println("    flow data length: " + frh.getFlowDataLength());
+			}
+
 			if (frh.getFlowDataFormat() == RAW_PACKET_HEADER) {
 				RawPacketHeader rph = RawPacketHeader.parse(subData);
 				frh.setRawPacketHeader(rph);

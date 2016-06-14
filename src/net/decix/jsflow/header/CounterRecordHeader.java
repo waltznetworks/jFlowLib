@@ -99,7 +99,7 @@ public class CounterRecordHeader {
 			byte[] subData = new byte[(int) crh.getCounterDataLength()];
 			System.arraycopy(data, 8, subData, 0, (int) crh.getCounterDataLength());
 
-			if (true) {
+			if (false) {
 				System.out.println("sFlow counter record header info:");
 				System.out.println("    counter data format: " + crh.getCounterDataFormat());
 				System.out.println("    counter data length: " + crh.getCounterDataLength());
@@ -118,12 +118,12 @@ public class CounterRecordHeader {
 				byte[] port = new byte[4];
 				System.arraycopy(subData, 0, dpid, 0, 8);
 				System.arraycopy(subData, 8, port, 0, 4);
-				System.out.println("OVS_DPID: " + DatatypeConverter.printHexBinary(dpid));
-				System.out.println("OVS_PORT: " + Utility.fourBytesToLong(port));
+				//System.out.println("OVS_DPID: " + DatatypeConverter.printHexBinary(dpid));
+				//System.out.println("OVS_PORT: " + Utility.fourBytesToLong(port));
 			} else if (crh.getCounterDataFormat() == OVS_SFLCOUNTERS_PORTNAME) {
 				byte[] portName = new byte[8];
 				System.arraycopy(subData, 0, portName, 0, 8);
-				System.out.println("OVS_PORTNAME: " + new String(portName));
+				//System.out.println("OVS_PORTNAME: " + new String(portName));
 			} else if (crh.getCounterDataFormat() == OVS_SFLCOUNTERS_APP_RESOURCES) {
 				System.err.println("OVS_SFLCOUNTERS_APP_RESOURCES(2203) not yet supported.");
 			} else if (crh.getCounterDataFormat() == OVS_SFLCOUNTERS_OVSDB) {
