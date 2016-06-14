@@ -36,8 +36,10 @@ public class CounterRecordHeader {
 	public static final int GENERICINTERFACECOUNTER = 1;
 	public static final int ETHERNETINTERFACECOUNTER = 2;
 
-	public static final int OVS_OPENFLOWPORT = 1004;
-	public static final int OVS_PORTNAME = 1005;
+	public static final int OVS_SFLCOUNTERS_OPENFLOWPORT = 1004;
+	public static final int OVS_SFLCOUNTERS_PORTNAME = 1005;
+	public static final int OVS_SFLCOUNTERS_APP_RESOURCES = 2203;
+	public static final int OVS_SFLCOUNTERS_OVSDB = 2207;
 	
 	private long counterDataFormat; // 20 bit enterprise & 12 bit format; standard enterprise 0, format 1, 2, 3, 4, 5, 1001 
 	private long counterDataLength; // in byte
@@ -111,17 +113,21 @@ public class CounterRecordHeader {
 				System.out.println("Received an Ethernet interface counter sample.");
 				EthernetInterfaceCounterHeader eic = EthernetInterfaceCounterHeader.parse(subData);
 				crh.setEthernetInterfaceCounterHeader(eic);
-			} else if (crh.getCounterDataFormat() == OVS_OPENFLOWPORT) {
+			} else if (crh.getCounterDataFormat() == OVS_SFLCOUNTERS_OPENFLOWPORT) {
 				byte[] dpid = new byte[8];
 				byte[] port = new byte[4];
 				System.arraycopy(subData, 0, dpid, 0, 8);
 				System.arraycopy(subData, 8, port, 0, 4);
 				System.out.println("OVS_DPID: " + DatatypeConverter.printHexBinary(dpid));
 				System.out.println("OVS_PORT: " + Utility.fourBytesToLong(port));
-			} else if (crh.getCounterDataFormat() == OVS_PORTNAME) {
+			} else if (crh.getCounterDataFormat() == OVS_SFLCOUNTERS_PORTNAME) {
 				byte[] portName = new byte[8];
 				System.arraycopy(subData, 0, portName, 0, 8);
 				System.out.println("OVS_PORTNAME: " + new String(portName));
+			} else if (crh.getCounterDataFormat() == OVS_SFLCOUNTERS_APP_RESOURCES) {
+				System.err.println("OVS_SFLCOUNTERS_APP_RESOURCES(2203) not yet supported.");
+			} else if (crh.getCounterDataFormat() == OVS_SFLCOUNTERS_OVSDB) {
+				System.err.println("OVS_SFLCOUNTERS_OVSDB(2207) not yet supported.");
 			} else {
 				System.err.println("Counter data format not yet supported: " + crh.getCounterDataFormat());
 			}
