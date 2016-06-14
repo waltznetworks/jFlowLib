@@ -87,8 +87,6 @@ public class CounterSampleHeader {
 				byte[] subData = new byte[data.length - offset];
 				System.arraycopy(data, offset, subData, 0, data.length - offset);
 				CounterRecordHeader crh = CounterRecordHeader.parse(subData);
-				// TODO: find out why csh.addCounterRecordHeaders(crh) is not working when
-				//       there is unsupported data format
 				csh.addCounterRecordHeaders(crh);
 				offset += (crh.getCounterDataLength() + 8);
 			}

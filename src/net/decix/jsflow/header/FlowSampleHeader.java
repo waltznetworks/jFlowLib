@@ -149,8 +149,6 @@ public class FlowSampleHeader {
 				byte[] subData = new byte[data.length - offset];
 				System.arraycopy(data, offset, subData, 0, data.length - offset);
 				FlowRecordHeader frh = FlowRecordHeader.parse(subData);
-				// TODO: find out why csh.addCounterRecordHeaders(crh) is not working when
-				//       there is unsupported data format
 				fsh.addFlowRecordHeaders(frh);
 				offset += (frh.getFlowDataLength() + 8);
 			}
