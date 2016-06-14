@@ -1,5 +1,6 @@
 package net.decix.jsflow.header;
 
+import net.decix.util.HeaderBytesException;
 import net.decix.util.HeaderParseException;
 import net.decix.util.Utility;
 import java.util.Vector;
@@ -130,7 +131,7 @@ public class FlowSampleHeader {
 			System.arraycopy(data, 28, length, 0, 4);
 			fsh.setSampleLength(Utility.fourBytesToLong(length));
 
-			if (true) {
+			if (false) {
 				System.out.println("sFlow flow sample header info:");
 				System.out.println("    flow sample sequence number: " + fsh.getSeqNumber());
 				System.out.println("    flow sample source ID type: " + fsh.getSourceIdType());
@@ -157,5 +158,73 @@ public class FlowSampleHeader {
 		} catch (Exception e) {
 			throw new HeaderParseException("Error parsing flow sample: " + e.getMessage());
 		}
+	}
+
+	public byte[] getBytes() throws HeaderBytesException {
+		try {
+			int lengthFlowRecord = 0;
+			for (FlowRecordHeader frh : flowRecordHeaders) {
+				lengthFlowRecord += (frh.getFlowDataLength() + 8);
+			}
+
+			byte[] data = new byte[32 + lengthFlowRecord];
+			// sequence number
+			System.arraycopy(Utility.longToFourBytes(seqNumber), 0, data, 0, 4);
+			// source ID type
+			System.arraycopy(Utility.integerToTwoBytes(sourceIdType), 0, data, 4, 6);
+			// source ID index value
+			System.arraycopy(Utility.integerToTwoBytes(sourceIdIndexValue), 0, data, 6, 8);
+			// sampling rate
+			System.arraycopy(Utility.longToFourBytes(samplingRate), 0, data, 8, 12);
+			// sample pool
+			System.arraycopy(Utility.longToFourBytes(samplePool), 0, data, 12, 16);
+			// drops
+			System.arraycopy(Utility.longToFourBytes(drops), 0, data, 16, 20);
+			// input
+			System.arraycopy(Utility.longToFourBytes(input), 0, data, 20, 24);
+			// output
+			System.arraycopy(Utility.longToFourBytes(output), 0, data, 24, 28);
+			// length
+			System.arraycopy(Utility.longToFourBytes(sampleLength), 0, data, 28, 32);
+
+			int offset = 32;
+			for (FlowRecordHeader frh : flowRecordHeaders) {
+				byte[] temp = frh.getBytes();
+				System.arraycopy(temp, 0, data, offset, temp.length);
+				offset += (frh.getFlowDataLength() + 8);
+			}
+			return data;
+		} catch (Exception e) {
+			throw new HeaderBytesException("Error while generating the bytes: " + e.getMessage());
+		}
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[FlowSampleHeader]: ");
+		sb.append("Sequence number: ");
+		sb.append(getSeqNumber());
+		sb.append(", Source ID type: ");
+		sb.append(getSourceIdType());
+		sb.append(", Source ID index value: ");
+		sb.append(getSourceIdIndexValue());
+		sb.append(", Sampling rate: ");
+		sb.append(getSamplingRate());
+		sb.append(", Sample pool: ");
+		sb.append(getSamplePool());
+		sb.append(", Drops: ");
+		sb.append(getDrops());
+		sb.append(", Input: ");
+		sb.append(getInput());
+		sb.append(", Output: ");
+		sb.append(getOutput());
+		sb.append(", Number of counter record: ");
+		sb.append(getSampleLength());
+		sb.append(", ");
+		for(FlowRecordHeader frh : flowRecordHeaders){
+			sb.append(frh);
+			sb.append(" ");
+		}
+		return sb.toString();
 	}
 }
