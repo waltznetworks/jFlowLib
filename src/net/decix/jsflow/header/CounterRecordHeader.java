@@ -107,7 +107,6 @@ public class CounterRecordHeader {
 				System.out.println("Received a generic interface counter sample.");
 				GenericInterfaceCounterHeader gic = GenericInterfaceCounterHeader.parse(subData);
 				crh.setGenericInterfaceCounterHeader(gic);
-				System.out.println(crh.toString());
 			} else if (crh.getCounterDataFormat() == ETHERNETINTERFACECOUNTER) {
 				System.out.println("Received an Ethernet interface counter sample.");
 				EthernetInterfaceCounterHeader eic = EthernetInterfaceCounterHeader.parse(subData);
