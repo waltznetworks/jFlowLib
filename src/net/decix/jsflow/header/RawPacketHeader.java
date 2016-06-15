@@ -134,6 +134,14 @@ public class RawPacketHeader {
 			byte[] headerSize  = new byte[4];
 			System.arraycopy(data, 12, headerSize, 0, 4);
 			rp.setHeaderSize(Utility.fourBytesToLong(headerSize));
+
+			if (true) {
+				System.out.println("sFlow flow record raw packet header info:");
+				System.out.println("    raw packet header protocol: " + rp.getHeaderProtocol());
+				System.out.println("    raw packet length: " + rp.getFrameLength());
+				System.out.println("    raw packet header stripped: " + rp.getStripped());
+				System.out.println("    raw packet header size: " + rp.getHeaderSize());
+			}
 			
 			if (rp.getHeaderProtocol() == ETHERNET_ISO88023) {
 				byte[] macHeader = new byte[data.length - 16]; 
