@@ -158,15 +158,25 @@ public class FlowRecordHeader {
 	
 	public byte[] getBytes() throws HeaderBytesException {
 		try {
-			byte[] rawPacketBytes = rawPacket.getBytes();
-			byte[] data = new byte[8 + rawPacketBytes.length];
+			byte[] subDataBytes = new byte[0];
+			if (flowDataFormat == RAW_PACKET_HEADER) {
+				subDataBytes = rawPacket.getBytes();
+			} else if (flowDataFormat == ETHERNET_FRAME_DATA) {
+				subDataBytes = ethernetFrameData.getBytes();
+			} else if (flowDataFormat == IPV4_DATA) {
+				subDataBytes = ipv4Data.getBytes();
+			} else {
+				System.err.println("Flow data format not yet supported: " + flowDataFormat);
+			}
+			byte[] data = new byte[8 + subDataBytes.length];
+
 			// format
 			System.arraycopy(Utility.longToFourBytes(flowDataFormat), 0, data, 0, 4);
 			// length
 			System.arraycopy(Utility.longToFourBytes(flowDataLength), 0, data, 4, 4);
-			
-			// raw packet header
-			System.arraycopy(rawPacketBytes, 0, data, 8, rawPacketBytes.length);
+			// subData
+			System.arraycopy(subDataBytes, 0, data, 8, subDataBytes.length);
+
 			return data;
 		} catch (Exception e) {
 			throw new HeaderBytesException("Error while generating the bytes: " + e.getMessage());
