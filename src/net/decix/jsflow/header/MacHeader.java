@@ -17,7 +17,7 @@ import net.decix.util.Utility;
 
 /**
  *  The sampler processor should strip preamble out of Ethernet
- *  frames.
+ *  frames, resulting into the following format:
  *
  *  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -28,15 +28,8 @@ import net.decix.util.Utility;
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *  |                     source MAC address                        |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *  |    tag protocol ID (0x8100)   |    tag control information    |
- *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *  |         Ethernet type         |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
- *  Tag protocol ID (TPID) and tag control information (TCI) are
- *  802.1Q VLAN tags. If not used, these two columns can be skipped.
- *  So a standard Ethernet frame is 14 bytes long and the tagged
- *  version is 18 bytes long.
  *
  *  We can tell which network layer protocol the frame is carrying
  *  by reading Ethernet type field.
