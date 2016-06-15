@@ -123,6 +123,19 @@ public class FlowRecordHeader {
 				System.out.println("    flow data length: " + frh.getFlowDataLength());
 			}
 
+			/* According to sFlow v5 specification:
+			 *   The preferred format for reporting packet header information is the
+			 *   sampled_header (RAW_PACKET_HEADER). However, if the packet header
+			 *   is not available to the sampling process, then one or more of
+			 *   sampled_ethernet (ETHERNET_FRAME_DATA), sampled_ipv4 (IPV4_DATA),
+			 *   sampled_ipv6 (IPV6_DATA) may be used.
+			 *
+			 *   Hence, if the packet header is available, then a flow sample will
+			 *   contain only one flow record and that only record is the
+			 *   sampled_header (RAW_PACKET_HEADER). Only if the packet header is
+			 *   not available will the sampling process export more than one flow
+			 *   record in a flow sample.
+			 */
 			if (frh.getFlowDataFormat() == RAW_PACKET_HEADER) {
 				RawPacketHeader rph = RawPacketHeader.parse(subData);
 				frh.setRawPacketHeader(rph);
