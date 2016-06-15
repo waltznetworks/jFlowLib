@@ -124,6 +124,7 @@ public class FlowRecordHeader {
 			}
 
 			/* According to sFlow v5 specification:
+			 *   Link: http://sflow.org/sflow_version_5.txt
 			 *   The preferred format for reporting packet header information is the
 			 *   sampled_header (RAW_PACKET_HEADER). However, if the packet header
 			 *   is not available to the sampling process, then one or more of
