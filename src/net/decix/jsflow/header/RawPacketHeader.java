@@ -153,9 +153,9 @@ public class RawPacketHeader {
 			}
 			
 			return rp;
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			throw new HeaderParseException("Parse error: " + e.getMessage());
-		}		
+		}
 	}
 	
 	public byte[] getBytes() throws HeaderBytesException {
