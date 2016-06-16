@@ -39,6 +39,12 @@ import net.decix.util.Utility;
  */
 
 public class MacHeader {
+	public static final int TYPE_IPV4 = 0x0800;
+	public static final int TYPE_ARP = 0x0806;
+	public static final int TYPE_IPV6 = 0x86DD;
+	public static final int TYPE_MPLS_UNICAST = 0x8847;
+	public static final int TYPE_MPLS_MULTICAST = 0x8848;
+
 	protected long destination;
 	protected long source;
 	protected int type;
