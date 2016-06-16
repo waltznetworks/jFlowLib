@@ -81,7 +81,8 @@ public class MacHeader {
 	public static MacHeader parse(byte data[]) throws HeaderParseException {
 		try {
 			if (data.length < 14) throw new HeaderParseException("Data array too short.");
-			
+
+			// Check if it is a 802.1Q VLAN tagged frame
 			if ((data[12] == (byte) (0x81 & 0xFF)) && (data[13] == (byte) (0x00 & 0xFF))) {
 				return TaggedMacHeader.parse(data);
 			}
