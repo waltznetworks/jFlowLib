@@ -99,7 +99,7 @@ public class MacHeader {
 			m.setOffCut(offcut);
 			return m;
 		} catch (Exception e) {
-			throw new HeaderParseException("Parse error: " + e.getMessage());
+			throw new HeaderParseException("Error parsing MAC header: " + e.getMessage());
 		}		
 	}
 	
