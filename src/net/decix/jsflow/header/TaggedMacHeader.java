@@ -83,6 +83,12 @@ public class TaggedMacHeader extends MacHeader {
 			byte payload[] = new byte[data.length - 18];
 			System.arraycopy(data, 18, payload, 0, data.length - 18);
 			tmh.setPayload(payload);
+
+			if (tmh.getType() == TYPE_IPV4) {
+				IPv4Header i4h = IPv4Header.parse(payload);
+				tmh.setIpv4Header(i4h);
+			}
+
 			return tmh;
 		} catch (Exception e) {
 			throw new HeaderParseException("Error parsing tagged MAC header: " + e.getMessage());
@@ -101,7 +107,7 @@ public class TaggedMacHeader extends MacHeader {
 			System.arraycopy(Utility.integerToTwoBytes(tci), 0, data, 14, 2);
 			// type
 			System.arraycopy(Utility.integerToTwoBytes(type), 0, data, 16, 2);
-			// offcut
+			// payload
 			System.arraycopy(payload, 0, data, 18, payload.length);
 			
 			return data;
