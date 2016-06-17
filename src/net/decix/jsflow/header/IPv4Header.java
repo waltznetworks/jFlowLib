@@ -106,9 +106,9 @@ public class IPv4Header {
 
 			byte ipVersionAndHeaderLength = data[0];
 			// version
-			i4h.setVersion(Utility.oneByteToInteger(ipVersionAndHeaderLength) / 4);
+			i4h.setVersion(Utility.oneByteToInteger(ipVersionAndHeaderLength) / 16);
 			// header length
-			i4h.setHeaderLength(Utility.oneByteToInteger(ipVersionAndHeaderLength) % 4);
+			i4h.setHeaderLength(Utility.oneByteToInteger(ipVersionAndHeaderLength) % 16);
 			// tos
 			byte tos = data[1];
 			i4h.setTos(Utility.oneByteToInteger(tos));
@@ -154,9 +154,9 @@ public class IPv4Header {
 			if (true) {
 				System.out.println("sFlow flow record IPv4 header info:");
 				System.out.println("    IPv4 header version: " + i4h.getVersion());
-				System.out.println("    IPv4 header length: " + i4h.getHeaderLength());
+				System.out.println("    IPv4 header length (word): " + i4h.getHeaderLength());
 				System.out.println("    IPv4 type of service: " + i4h.getTos());
-				System.out.println("    IPv4 packet length: " + i4h.getTotalLength());
+				System.out.println("    IPv4 packet length (byte): " + i4h.getTotalLength());
 				System.out.println("    IPv4 packet ID: " + i4h.getId());
 				System.out.println("    IPv4 packet TTL: " + i4h.getTtl());
 				System.out.println("    IPv4 packet protocol: " + i4h.getProtocol());
@@ -185,7 +185,7 @@ public class IPv4Header {
 
 			// version
 			// header length
-			data[0] = Utility.integerToOneByte(ipVersion * 4 + headerLength);
+			data[0] = Utility.integerToOneByte(ipVersion * 16 + headerLength);
 			// tos
 			data[1] = Utility.integerToOneByte(tos);
 			// total length (packet length)
