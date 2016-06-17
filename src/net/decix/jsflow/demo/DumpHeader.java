@@ -26,6 +26,7 @@ import net.decix.jsflow.header.GenericInterfaceCounterHeader;
 import net.decix.jsflow.header.SampleDataHeader;
 import net.decix.jsflow.header.SFlowHeader;
 import net.decix.util.HeaderParseException;
+import net.decix.util.MacAddress;
 import net.decix.util.Utility;
 
 public class DumpHeader {
@@ -52,9 +53,9 @@ public class DumpHeader {
 							Vector<FlowRecordHeader> frhs = efsh.getFlowRecords();
 							for (FlowRecordHeader frh : frhs) {
 								frh.getRawPacketHeader().getHeaderProtocol();
-								long macSource = frh.getRawPacketHeader().getMacHeader().getSource();
-								long macDestination = frh.getRawPacketHeader().getMacHeader().getSource();
-								System.out.println("FlowRecord: Communication " + macSource + "->" + macDestination);
+								MacAddress macSource = frh.getRawPacketHeader().getMacHeader().getSrcMac();
+								MacAddress macDestination = frh.getRawPacketHeader().getMacHeader().getDstMac();
+								System.out.println("FlowRecord: Communication " + macSource.toString() + "->" + macDestination.toString());
 							}
 						}
 						if (sdh.getSampleDataFormat() == SampleDataHeader.EXPANDEDCOUNTERSAMPLE) {
