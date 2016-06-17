@@ -110,9 +110,15 @@ public class MacHeader {
 			System.arraycopy(data, 12, type, 0, 2);
 			mh.setType(Utility.twoBytesToInteger(type));
 			// payload
-			byte payload[] = new byte[data.length - 14];
-			System.arraycopy(data, 14, payload, 0, data.length - 14);
-			mh.setPayload(payload);
+			int offset = 14;
+			byte payload[] = new byte[data.length - offset];
+			System.arraycopy(data, 14, payload, 0, data.length - offset);
+
+			if (mh.getType() == TYPE_IPV4) {
+				IPv4Header i4h = IPv4Header.parse(payload);
+				mh.setIpv4Header(i4h);
+			}
+
 			return mh;
 		} catch (Exception e) {
 			throw new HeaderParseException("Error parsing MAC header: " + e.getMessage());

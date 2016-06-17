@@ -28,14 +28,14 @@ import net.decix.util.Utility;
  *
  */
 public class IPv4Header {
-	protected static int ipVersion;
-	protected static int headerLength;
+	protected static int ipVersion;     // should always be 4
+	protected static int headerLength;  // RFC 791: 5 * 32 bits <= headerLength <= 15 * 32 bits
 	protected static int tos;
 	protected static int totalLength;
 	protected static int id;
 	protected static byte[] flagsAndFragmentOffset;
 	protected static int ttl;
-	protected static int protocol;
+	protected static int protocol;      // RFC 790
 	protected static int checksum;
 	protected static Address srcIp;
 	protected static Address dstIp;
