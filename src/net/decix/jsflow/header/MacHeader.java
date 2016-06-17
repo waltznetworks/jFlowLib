@@ -49,7 +49,9 @@ public class MacHeader {
 	protected MacAddress dstMac;
 	protected MacAddress srcMac;
 	protected int type;
+
 	protected byte payload[];
+	protected IPv4Header ipv4Header;
 
 	public void setDstMac(MacAddress dstMac) {
 		this.dstMac = dstMac;
@@ -63,6 +65,12 @@ public class MacHeader {
 		this.type = type;
 	}
 
+	public void setPayload(byte payload[]) {
+		this.payload = payload;
+	}
+
+	public void setIpv4Header(IPv4Header ipv4Header) { this.ipv4Header = ipv4Header; }
+
 	public MacAddress getDstMac() {
 		return dstMac;
 	}
@@ -75,9 +83,9 @@ public class MacHeader {
 		return type;
 	}
 	
-	public void setPayload(byte payload[]) {
-		this.payload = payload;
-	}
+	public byte[] getPayload() { return payload; }
+
+	public IPv4Header getIpv4Header() { return ipv4Header; }
 
 	public static MacHeader parse(byte data[]) throws HeaderParseException {
 		try {
@@ -101,7 +109,7 @@ public class MacHeader {
 			byte type[] = new byte[2];
 			System.arraycopy(data, 12, type, 0, 2);
 			mh.setType(Utility.twoBytesToInteger(type));
-			// offcut
+			// payload
 			byte payload[] = new byte[data.length - 14];
 			System.arraycopy(data, 14, payload, 0, data.length - 14);
 			mh.setPayload(payload);
