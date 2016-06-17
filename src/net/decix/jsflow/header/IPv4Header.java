@@ -150,6 +150,20 @@ public class IPv4Header {
 				i4h.setOptionsAndPadding(optionsAndPadding);
 				offset = 24;
 			}
+
+			if (true) {
+				System.out.println("sFlow flow record IPv4 header info:");
+				System.out.println("    IPv4 header version: " + i4h.getVersion());
+				System.out.println("    IPv4 header length: " + i4h.getHeaderLength());
+				System.out.println("    IPv4 type of service: " + i4h.getTos());
+				System.out.println("    IPv4 packet length: " + i4h.getTotalLength());
+				System.out.println("    IPv4 packet ID: " + i4h.getId());
+				System.out.println("    IPv4 packet TTL: " + i4h.getTtl());
+				System.out.println("    IPv4 packet protocol: " + i4h.getProtocol());
+				System.out.println("    IPv4 packet checksum: " + i4h.getChecksum());
+				System.out.println("    IPv4 packet source IP: " + i4h.getSrcIp().toString());
+				System.out.println("    IPv4 packet destination IP: " + i4h.getDstIp().toString());
+			}
 			// payload
 			byte[] payload = new byte[data.length - offset];
 			System.arraycopy(data, offset, payload, 0, data.length - offset);
@@ -205,6 +219,26 @@ public class IPv4Header {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[IPv4 header]: ");
+		sb.append(", Version: ");
+		sb.append(getVersion());
+		sb.append(", Header length: ");
+		sb.append(getHeaderLength());
+		sb.append(", Type of service: ");
+		sb.append(getTos());
+		sb.append(", Packet length: ");
+		sb.append(getTotalLength());
+		sb.append(", Identification: ");
+		sb.append(getId());
+		sb.append(", Ttl: ");
+		sb.append(getTtl());
+		sb.append(", Protocol: ");
+		sb.append(getProtocol());
+		sb.append(", Checksum: ");
+		sb.append(getChecksum());
+		sb.append(", Source IP: ");
+		sb.append(getSrcIp().toString());
+		sb.append(", Destination IP: ");
+		sb.append(getDstIp().toString());
 
 		return sb.toString();
 	}
