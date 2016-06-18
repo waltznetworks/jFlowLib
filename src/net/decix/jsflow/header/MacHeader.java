@@ -114,6 +114,13 @@ public class MacHeader {
 			byte payload[] = new byte[data.length - offset];
 			System.arraycopy(data, 14, payload, 0, data.length - offset);
 
+			if (true) {
+				System.out.println("sFlow flow record MAC header info:");
+				System.out.println("    MAC header destination: " + mh.getDstMac().toString());
+				System.out.println("    MAC header source: " + mh.getSrcMac().toString());
+				System.out.println("    MAC header type: " + mh.getType());
+			}
+
 			if (mh.getType() == TYPE_IPV4) {
 				IPv4Header i4h = IPv4Header.parse(payload);
 				mh.setIpv4Header(i4h);

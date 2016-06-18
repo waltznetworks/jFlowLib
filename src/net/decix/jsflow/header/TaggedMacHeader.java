@@ -84,6 +84,15 @@ public class TaggedMacHeader extends MacHeader {
 			System.arraycopy(data, 18, payload, 0, data.length - 18);
 			tmh.setPayload(payload);
 
+			if (true) {
+				System.out.println("sFlow flow record tagged MAC header info:");
+				System.out.println("    Tagged MAC header destination: " + tmh.getDstMac().toString());
+				System.out.println("    Tagged MAC header source: " + tmh.getSrcMac().toString());
+				System.out.println("    Tagged MAC header tagged protocol ID: " + tmh.getTpid());
+				System.out.println("    Tagged MAC header tagged control info: " + tmh.getTCI());
+				System.out.println("    Tagged MAC header type: " + tmh.getType());
+			}
+
 			if (tmh.getType() == TYPE_IPV4) {
 				IPv4Header i4h = IPv4Header.parse(payload);
 				tmh.setIpv4Header(i4h);

@@ -131,7 +131,7 @@ public class FlowSampleHeader {
 			System.arraycopy(data, 28, length, 0, 4);
 			fsh.setSampleLength(Utility.fourBytesToLong(length));
 
-			if (false) {
+			if (true) {
 				System.out.println("sFlow flow sample header info:");
 				System.out.println("    flow sample sequence number: " + fsh.getSeqNumber());
 				System.out.println("    flow sample source ID type: " + fsh.getSourceIdType());
