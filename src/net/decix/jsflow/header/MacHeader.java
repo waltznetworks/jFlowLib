@@ -13,84 +13,136 @@ package net.decix.jsflow.header;
 
 import net.decix.util.HeaderBytesException;
 import net.decix.util.HeaderParseException;
+import net.decix.util.MacAddress;
 import net.decix.util.Utility;
 
+/**
+ *  The sampler processor should strip preamble out of Ethernet
+ *  frames, resulting into the following format:
+ *
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                   destination MAC address                     |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |    destination MAC address    |       source MAC address      |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                     source MAC address                        |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |         Ethernet type         |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ *  We can tell which network layer protocol the frame is carrying
+ *  by reading Ethernet type field.
+ *
+ * @author Hans Yu
+ *
+ */
+
 public class MacHeader {
-	protected long destination;
-	protected long source;
+	public static final int TYPE_IPV4 = 0x0800;
+	public static final int TYPE_ARP = 0x0806;
+	public static final int TYPE_IPV6 = 0x86DD;
+	public static final int TYPE_MPLS_UNICAST = 0x8847;
+	public static final int TYPE_MPLS_MULTICAST = 0x8848;
+
+	protected MacAddress dstMac;
+	protected MacAddress srcMac;
 	protected int type;
-	protected byte offcut[];
 
-	public long getDestination() {
-		return destination;
+	protected byte payload[];
+	protected IPv4Header ipv4Header;
+
+	public void setDstMac(MacAddress dstMac) {
+		this.dstMac = dstMac;
 	}
 
-	public long getSource() {
-		return source;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setDestination(long destination) {
-		this.destination = destination;
-	}
-
-	public void setSource(long source) {
-		this.source = source;
+	public void setSrcMac(MacAddress srcMac) {
+		this.srcMac = srcMac;
 	}
 
 	public void setType(int type) {
 		this.type = type;
 	}
-	
-	public void setOffCut(byte offcut[]) {
-		this.offcut = offcut;
+
+	public void setPayload(byte payload[]) {
+		this.payload = payload;
 	}
+
+	public void setIpv4Header(IPv4Header ipv4Header) { this.ipv4Header = ipv4Header; }
+
+	public MacAddress getDstMac() {
+		return dstMac;
+	}
+
+	public MacAddress getSrcMac() {
+		return srcMac;
+	}
+
+	public int getType() {
+		return type;
+	}
+	
+	public byte[] getPayload() { return payload; }
+
+	public IPv4Header getIpv4Header() { return ipv4Header; }
 
 	public static MacHeader parse(byte data[]) throws HeaderParseException {
 		try {
 			if (data.length < 14) throw new HeaderParseException("Data array too short.");
-			
+
+			// Check if it is an 802.1Q VLAN tagged frame
 			if ((data[12] == (byte) (0x81 & 0xFF)) && (data[13] == (byte) (0x00 & 0xFF))) {
 				return TaggedMacHeader.parse(data);
 			}
 			
-			MacHeader m = new MacHeader();
-			// destination
-			byte destination[] = new byte[6];
-			System.arraycopy(data, 0, destination, 0, 6);
-			m.setDestination(Utility.sixBytesToLong(destination));
-			// source
-			byte source[] = new byte[6];
-			System.arraycopy(data, 6, source, 0, 6);
-			m.setSource(Utility.sixBytesToLong(source));
+			MacHeader mh = new MacHeader();
+			// destination MAC
+			byte dstMac[] = new byte[6];
+			System.arraycopy(data, 0, dstMac, 0, 6);
+			mh.setDstMac(new MacAddress(dstMac));
+			// source MAC
+			byte srcMac[] = new byte[6];
+			System.arraycopy(data, 6, srcMac, 0, 6);
+			mh.setSrcMac(new MacAddress(srcMac));
 			// type
 			byte type[] = new byte[2];
 			System.arraycopy(data, 12, type, 0, 2);
-			m.setType(Utility.twoBytesToInteger(type));
-			// offcut
-			byte offcut[] = new byte[data.length - 14];
-			System.arraycopy(data, 14, offcut, 0, data.length - 14);
-			m.setOffCut(offcut);
-			return m;
+			mh.setType(Utility.twoBytesToInteger(type));
+			// payload
+			int offset = 14;
+			byte payload[] = new byte[data.length - offset];
+			System.arraycopy(data, 14, payload, 0, data.length - offset);
+
+			if (true) {
+				System.out.println("sFlow flow record MAC header info:");
+				System.out.println("    MAC header destination: " + mh.getDstMac().toString());
+				System.out.println("    MAC header source: " + mh.getSrcMac().toString());
+				System.out.println("    MAC header type: " + mh.getType());
+			}
+
+			if (mh.getType() == TYPE_IPV4) {
+				IPv4Header i4h = IPv4Header.parse(payload);
+				mh.setIpv4Header(i4h);
+			}
+
+			return mh;
 		} catch (Exception e) {
-			throw new HeaderParseException("Parse error: " + e.getMessage());
+			throw new HeaderParseException("Error parsing MAC header: " + e.getMessage());
 		}		
 	}
 	
 	public byte[] getBytes() throws HeaderBytesException {
 		try {
-			byte[] data = new byte[14 + offcut.length];
-			// destination
-			System.arraycopy(Utility.longToSixBytes(destination), 0, data, 0, 6);
-			// source
-			System.arraycopy(Utility.longToSixBytes(source), 0, data, 6, 6);
+			byte[] data = new byte[14 + payload.length];
+			// destination MAC
+			System.arraycopy(dstMac.getBytes(), 0, data, 0, 6);
+			// source MAC
+			System.arraycopy(srcMac.getBytes(), 0, data, 6, 6);
 			// type
 			System.arraycopy(Utility.integerToTwoBytes(type), 0, data, 12, 2);
-			// offcut
-			System.arraycopy(offcut, 0, data, 14, offcut.length);
+			// payload
+			System.arraycopy(payload, 0, data, 14, payload.length);
 			
 			return data;
 		} catch (Exception e) {
@@ -103,13 +155,13 @@ public class MacHeader {
 		
 		sb.append("[MacHeader]: ");
 		sb.append(", Destination: ");
-		sb.append(getDestination());
+		sb.append(getDstMac());
 		sb.append(", Source: ");
-		sb.append(getSource());
+		sb.append(getSrcMac());
 		sb.append(", Type: ");
 		sb.append(getType());
-		sb.append(", OFFCUT: ");
-		sb.append(offcut.length);
+		sb.append(", Payload length: ");
+		sb.append(payload.length);
 		
 		return sb.toString();
 	}
